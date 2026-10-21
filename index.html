@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mystery Movie Detectives</title>
+<meta name="color-scheme" content="light">
+<style>
+:root{--navy:#14213d;--paper:#fbf3df;--ink:#1d2433;--red:#b3261e;--teal:#0f766e;--gold:#f4b942;--tab:#e9cf94;--ok:#1b6e3a;--bad:#b3261e}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--navy);color:var(--ink);font:19px/1.65 Verdana,"Trebuchet MS",sans-serif;background-image:radial-gradient(circle at 1px 1px,#2a3a5e 1px,transparent 0);background-size:22px 22px}
+h1,h2,h3{font-family:"Courier New",Courier,monospace;line-height:1.2;margin:.2em 0 .5em}
+h1{font-size:clamp(1.9rem,6vw,3.2rem);letter-spacing:.02em}
+h2{font-size:1.6rem}h3{font-size:1.2rem}
+header{max-width:900px;margin:0 auto;padding:12px 12px 0}
+.brand{color:var(--gold);font:bold 1rem "Courier New",monospace;margin:4px 0 8px}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{flex:1 1 90px;font:inherit;font-size:.85rem;font-weight:bold;padding:8px 6px;border:0;border-radius:10px 10px 0 0;background:#2a3a5e;color:#fff;cursor:pointer}
+nav button[aria-current=true]{background:var(--paper);color:var(--ink)}
+nav button.done::after{content:" ✓";color:var(--gold)}
+nav button[aria-current=true].done::after{color:var(--ok)}
+.bar{height:8px;background:#2a3a5e;max-width:900px;margin:0 auto}
+.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .4s}
+main{max-width:900px;margin:0 auto;background:var(--paper);padding:20px 16px 36px;border-radius:0 0 14px 14px;min-height:70vh}
+section{display:none}section.on{display:block}
+.hero{text-align:center;padding:10px 0}
+.stamp{display:inline-block;border:4px solid var(--red);color:var(--red);font:bold 1rem "Courier New",monospace;padding:2px 14px;transform:rotate(-4deg);border-radius:6px}
+.big{font-size:4rem;line-height:1}
+.ms{color:#5b4a1f;font-size:.85em}
+button.go,.opt,.chip{font:inherit;cursor:pointer}
+.go{background:var(--gold);color:var(--ink);border:3px solid var(--ink);border-radius:12px;padding:12px 22px;font-weight:bold;font-size:1.05rem;margin:8px 8px 8px 0}
+.go:hover{background:#ffd06b}
+.go.alt{background:#fff}
+.note{background:#fff;border-left:8px solid var(--teal);padding:10px 14px;border-radius:6px;margin:14px 0}
+.warn{border-left-color:var(--red)}
+.card{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:14px 16px;margin:14px 0}
+.ex{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.ex .card{margin:0;border-style:dashed}
+.q{color:var(--teal);font-weight:bold}
+.bad{color:var(--bad);text-decoration:line-through}.good{color:var(--ok);font-weight:bold}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:10px 14px;margin:8px 0}
+.opt:hover:not(:disabled){background:#fff3c8}
+.opt.right{background:#d6f0dc;border-color:var(--ok)}
+.opt.wrong{background:#fbdcd9;border-color:var(--bad)}
+.fb{padding:10px 14px;border-radius:8px;margin:10px 0;font-weight:bold}
+.fb.ok{background:#d6f0dc;color:#104d28}.fb.no{background:#fbdcd9;color:#7d1710}
+.movies{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.mv{font:inherit;cursor:pointer;text-align:center;border:3px solid var(--ink);border-radius:12px 12px 12px 30px;padding:14px 8px;background:var(--c);color:var(--ink);font-weight:bold}
+.mv span{display:block;font-size:2.6rem}
+.mv small{display:block;font-weight:normal}
+.mv[aria-pressed=true]{outline:4px solid var(--red);outline-offset:2px}
+.vocab{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.vocab div{background:#fff8dc;border:2px dashed #b8923a;border-radius:8px;padding:8px 10px;font-size:.95rem}
+.tip{background:#e3f4f1;border-radius:8px;padding:10px 14px;margin-top:12px}
+label{display:block;font-weight:bold;margin:10px 0 4px}
+select,textarea{width:100%;font:inherit;padding:8px 10px;border:2px solid var(--ink);border-radius:8px;background:#fff;color:var(--ink)}
+textarea{min-height:64px}
+.help{display:none;background:#fff8dc;border:2px dashed #b8923a;border-radius:8px;padding:10px 14px;margin-top:8px}
+.help.on{display:block}
+.clue{background:#fff;border:2px solid var(--ink);border-radius:8px;padding:8px 12px;margin:8px 0}
+.locked{background:#e5dcc3;border-style:dashed;color:#5b4a1f}
+.mys{border-top:6px solid var(--red)}
+.check{display:block;font-weight:normal;margin:6px 0}
+.check input{width:22px;height:22px;vertical-align:middle;margin-right:8px;accent-color:var(--teal)}
+.stats{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.stats .card{text-align:center;margin:0}
+.stats b{font:bold 2.2rem "Courier New",monospace;display:block}
+button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible{outline:4px solid #2563eb;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.ct{font:inherit;font-weight:bold;border:2px solid var(--ink);border-radius:10px;background:#fff;padding:8px 14px;cursor:pointer}.ct.cur{background:var(--gold)}
+.qrow{margin:12px 0}.qb{display:block;width:100%;text-align:left;font:inherit;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:10px 12px;cursor:pointer}.qb:disabled{background:#eaf6ec;border-color:var(--ok);color:var(--ink);cursor:default}
+.bd{display:inline-block;background:var(--teal);color:#fff;font-weight:bold;padding:1px 10px;border-radius:999px;margin-right:8px;font-size:.9rem}
+.build{background:#fff8dc;border:2px dashed #b8923a;border-radius:10px;padding:12px;margin-top:8px}
+.line{min-height:3em;background:#fff;border:2px solid var(--ink);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-weight:bold;color:var(--teal);font-size:1.1rem}
+.tile{font:inherit;font-weight:bold;background:var(--gold);border:2px solid var(--ink);border-radius:8px;padding:8px 14px;margin:4px;cursor:pointer}.tile:disabled{opacity:.35;cursor:default}
+.bub{background:#e3f4f1;border:2px solid var(--teal);border-radius:14px 14px 14px 2px;padding:10px 14px;margin:8px 0 0 12px}
+.stamp2{display:inline-block;border:4px solid var(--ok);color:var(--ok);font:bold 1.3rem "Courier New",monospace;padding:2px 14px;transform:rotate(-3deg);border-radius:6px;margin-bottom:8px}.stamp2.no{border-color:var(--bad);color:var(--bad)}
+@media (max-width:520px){body{font-size:18px}nav button{font-size:.75rem;flex-basis:60px}}
+</style>
+</head>
+<body>
+<header>
+<div class="brand">🕵️ DETECTIVE HEADQUARTERS · Year 5 English</div>
+<nav id="nav" aria-label="Missions"></nav>
+</header>
+<div class="bar" role="progressbar" aria-label="Mission progress" aria-valuemin="0" aria-valuemax="3" id="pb"><i id="pbi"></i></div>
+<main>
+
+<section id="s0" class="on">
+<div class="hero">
+<div class="big" aria-hidden="true">🔍🐾🎬</div>
+<h1>MYSTERY MOVIE DETECTIVES</h1>
+<p class="stamp">Crack the Four Movie Mysteries!</p>
+<h2>Four Movies. Hidden Clues. One Junior Detective.</h2>
+</div>
+<p>Welcome, detective! You will learn to <b>form questions</b>, investigate facts about four movies, and solve four movie mysteries. <span class="ms">(Anda akan belajar membina soalan dan menyelesaikan empat misteri filem.)</span></p>
+<div class="note"><b>Work independently.</b> Write your answers in your English exercise book. <span class="ms">(Buat sendiri. Tulis jawapan dalam buku latihan Bahasa Inggeris.)</span></div>
+<p style="text-align:center"><button class="go" onclick="go(1)">START MISSION 🔎</button></p>
+</section>
+
+<section id="s1">
+<h2>Mission 1: Train Your Detective Brain</h2>
+<p>A question starts with a question word. Look at the clues:</p>
+<div class="ex" id="ex"></div>
+<h3>Three patterns</h3>
+<div class="card">
+<p><b>1.</b> What / Where / When / Who / How + <b>did</b> + subject + <b>base verb</b>?<br><span class="q">Where did Moana live?</span></p>
+<p><b>2.</b> Was / Were + subject + complement?<br><span class="q">Was Dory a blue fish? Were Anna and Elsa sisters?</span></p>
+<p><b>3.</b> Did + subject + <b>base verb</b>?<br><span class="q">Did Moana sail across the ocean?</span></p>
+<p class="note"><b>Remember:</b> after DID, the verb goes back to its base form (live, not lived). Questions with WAS and WERE do not use DID.<br><span class="ms">(Selepas DID, guna kata kerja asas. WAS/WERE tidak guna DID.)</span></p>
+</div>
+<h3>Common mistakes</h3>
+<div class="card">
+<p><span class="bad">Where did Moana lived?</span> → <span class="good">Where did Moana live?</span></p>
+<p><span class="bad">What Elsa was?</span> → <span class="good">What was Elsa like?</span> This asks about her characteristics (for example, kind or brave), not what she was doing.</p>
+</div>
+<h3>Practice: choose the correct question</h3>
+<div id="quiz" class="card" aria-live="polite"></div>
+</section>
+
+<section id="s2">
+<h2>Mission 2: Investigate the Four Movies</h2>
+<p>Tap each movie file. You can open them in any order. <span class="ms">(Tekan setiap fail filem.)</span></p>
+<div class="movies" id="movies"></div>
+<div id="mvbox" aria-live="polite"></div>
+</section>
+
+<section id="s3">
+<h2>Mission 3: Crack the Four Movie Mysteries</h2>
+<p>Each case is a <b>secret movie</b>. Ask the witness five questions to collect details. Then write your own guess and check it! <span class="ms">(Tanya lima soalan, kumpul butiran, teka filem, kemudian semak.)</span></p>
+<div id="mys"></div>
+<div class="note"><b>Record Mystery 1–4 and your movie guesses in your English exercise book.</b></div>
+</section>
+
+<section id="s4">
+<h2>Mission 4: Detective Report</h2>
+<div id="rep"></div>
+</section>
+
+</main>
+<script>
+var NAMES=["Home","Mission 1","Mission 2","Mission 3","Report"];
+var M=[
+{n:"Frozen",em:"❄️",c:"#bfe6ff",story:"Elsa and Anna are sisters. Elsa has magic that makes ice and snow. Anna goes on a journey to find her sister.",
+facts:["Elsa and Anna were sisters.","Elsa could make ice and snow with her magic.","They lived in a kingdom called Arendelle.","Anna met Kristoff, and his reindeer was called Sven.","Olaf was a snowman who loved warm hugs."],
+v:[["kingdom","a land ruled by a king or queen"],["magic","a special power that is not real in our world"],["journey","a long trip"]],
+s:"Elsa’s magic made ice and snow, so the kingdom became freezing. What does freezing mean?",o:["very, very cold","very, very noisy","very, very small"],a:0,
+why:"Ice and snow make a place very cold. Freezing means very, very cold."},
+{n:"Moana",em:"🌊",c:"#9fe8d9",story:"Moana lives on an island and loves the ocean. She sails across the sea to help her island.",
+facts:["Moana lived on the island of Motunui.","Her father was the chief of the island.","Moana sailed across the ocean in a boat.","She met Maui, who had a magic fish hook.","Heihei, a funny chicken, went on the boat too."],
+v:[["island","land with water all around it"],["voyage","a long journey by sea"],["chief","the leader of a village"]],
+s:"Moana’s father was the chief, so the villagers listened to him. What does chief mean?",o:["the leader of a village","a kind of fish","a type of boat"],a:0,
+why:"The villagers listened to him, so he was their leader. Chief means the leader of a village."},
+{n:"Finding Nemo",em:"🐠",c:"#ffc58a",story:"Nemo is a young clownfish who lives in the sea. When Nemo is taken away, his father swims far to find him.",
+facts:["Nemo was a young clownfish.","His father was called Marlin.","A diver took Nemo to a fish tank in Sydney.","Dory, a blue fish, helped Marlin.","Dory often forgot things."],
+v:[["reef","a line of rocks or coral in the sea"],["diver","a person who swims under water"],["search","to look carefully for something"]],
+s:"Marlin was worried, so he began to search for his son. What does search mean?",o:["to look carefully for something","to fall asleep","to paint a picture"],a:0,
+why:"Marlin wanted to find his son, so he looked for him. Search means to look carefully for something."},
+{n:"Kung Fu Panda",em:"🐼",c:"#e4d9ff",story:"Po is a panda who loves kung fu. He works in a noodle shop, but he dreams of becoming a great warrior.",
+facts:["Po was a giant panda.","Po worked in his father’s noodle shop.","His father, Mr Ping, was a goose.","Po lived in the Valley of Peace.","Master Shifu taught kung fu to the Furious Five."],
+v:[["warrior","a brave fighter"],["master","a teacher with great skill"],["practise","to do something again and again to get better"]],
+s:"Po practised every day because he wanted to become a great warrior. What does warrior mean?",o:["a brave fighter","a kind of noodle","a loud noise"],a:0,
+why:"Po wanted to learn kung fu, so he wanted to be a brave fighter. Warrior means a brave fighter."}
+];
+var MM=[{n:"Inside Out",em:"🧠"},{n:"The Incredibles",em:"🦸"},{n:"Toy Story",em:"🤠"},{n:"Coco",em:"🎸"}];
+var QS=[
+{w:"WHO",t:["Who","was","the","main","character","?"],d:["were"],h:"Who + was + subject. Use WAS for one person. Do not use DID."},
+{w:"WHERE",t:["Where","did","the","story","happen","?"],d:["happened"],h:"Where + did + subject + base verb (happen, not happened)."},
+{w:"WHAT",t:["What","did","the","characters","want","?"],d:["wanted"],h:"After did, use the base verb: want, not wanted."},
+{w:"HOW",t:["How","did","the","main","character","feel","?"],d:["felt"],h:"After did, use the base verb: feel, not felt."},
+{w:"DID",t:["Did","the","main","character","have","a","special","power","?"],d:["had"],h:"Did + subject + base verb: have, not had."}
+];
+var CASES=[
+{m:3,a:["A young boy who played the guitar.","In a small town in Mexico and in a colourful world of skeletons.","He wanted to be a musician.","He felt sad because his family did not allow music.","No. He was an ordinary boy, but he found a magic world."],why:"A boy, music, Mexico and a world of skeletons all point to Coco."},
+{m:0,a:["A girl who was eleven years old. Five feelings lived in her mind.","In a big new city and inside a girl’s mind.","They wanted the girl to be happy in her new home.","She felt sad and lonely in her new city.","No. She was an ordinary girl, but her feelings were the stars of the story."],why:"A girl, five feelings and a story inside her mind all point to Inside Out."},
+{m:2,a:["A cowboy toy. His friend was a space toy.","Mostly in a boy’s house.","The cowboy wanted to stay the boy’s favourite toy.","He felt jealous of the new space toy.","No. The toys had no special powers, but they moved when no one was looking."],why:"A cowboy toy, a space toy and a boy’s house all point to Toy Story."},
+{m:1,a:["A family of five. The father was very strong.","In a busy city and on a faraway island.","The father missed being a hero. The mother wanted her family to be safe.","The father felt bored in his normal job.","Yes! The whole family had special powers."],why:"A family with special powers and a father who missed being a hero all point to The Incredibles."}
+];
+var EX=[["Moana loved the ocean.","WHAT","What did Moana love?"],["Moana lived on an island.","WHERE","Where did Moana live?"],["Nemo was a young clownfish.","WHO","Who was a young clownfish?"],["The family watched the film yesterday.","WHEN","When did the family watch the film?"],["Elsa was happy.","HOW","How was Elsa?"]];
+var Q=[
+{f:"Nemo lived on a reef. Ask about the PLACE.",o:["Where did Nemo live?","Where did Nemo lived?","Where Nemo live?"],a:0,e:"After DID, use the base verb: live."},
+{f:"Anna and Elsa were sisters. Ask a yes/no question.",o:["Did Anna and Elsa were sisters?","Were Anna and Elsa sisters?","Was Anna and Elsa sisters?"],a:1,e:"Use WERE for more than one person. Do not use DID with WERE."},
+{f:"Po loved kung fu. Ask about the THING.",o:["What Po love?","What did Po loved?","What did Po love?"],a:2,e:"What + did + subject + base verb (love)."},
+{f:"Dory was a blue fish. Ask a yes/no question.",o:["Did Dory was a blue fish?","Was Dory a blue fish?","Were Dory a blue fish?"],a:1,e:"Use WAS for one person. WAS and WERE come before the subject."},
+{f:"Moana helped Maui. Ask a yes/no question.",o:["Did Moana helped Maui?","Do Moana help Maui?","Did Moana help Maui?"],a:2,e:"Did + subject + base verb (help)."}
+];
+var S={qi:0,q:false,seen:{},ms:[null,null,null,null],cs:0,qd:[{},{},{},{}],op:null,cur:[],bank:null,msg:"",tries:[0,0,0,0],page:0};
+function $(i){return document.getElementById(i)}
+function esc(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function done(){var m3=S.ms.every(function(x){return x!==null});return [S.q,Object.keys(S.seen).length===4,m3,S.page===4&&S.q&&Object.keys(S.seen).length===4&&m3]}
+function upd(){
+ var d=done(),n=0;
+ NAMES.forEach(function(x,i){var b=$("nb"+i);b.setAttribute("aria-current",S.page===i);b.className=(i>0&&d[i-1])?"done":""});
+ d.slice(0,3).forEach(function(x){if(x)n++});
+ $("pbi").style.width=(n/3*100)+"%";$("pb").setAttribute("aria-valuenow",n);
+}
+function go(i){
+ S.page=i;
+ for(var k=0;k<5;k++)$("s"+k).className=k===i?"on":"";
+ if(i===4)report();
+ upd();window.scrollTo(0,0);
+}
+/* nav */
+NAMES.forEach(function(t,i){var b=document.createElement("button");b.id="nb"+i;b.textContent=t;b.onclick=function(){go(i)};$("nav").appendChild(b)});
+/* Mission 1 */
+$("ex").innerHTML=EX.map(function(e){return '<div class="card"><p>Fact: '+e[0]+'</p><p>Question word: <b>'+e[1]+'</b></p><p class="q">'+e[2]+'</p></div>'}).join("");
+function quiz(){
+ var q=Q[S.qi];
+ $("quiz").innerHTML='<p><b>Question '+(S.qi+1)+' of 5</b><br>'+q.f+'</p>'+q.o.map(function(o,i){return '<button class="opt" onclick="pick('+i+')">'+o+'</button>'}).join("")+'<div id="qfb"></div>';
+}
+function pick(i){
+ var q=Q[S.qi],bs=$("quiz").querySelectorAll(".opt"),fb=$("qfb");
+ if(i===q.a){
+  bs.forEach(function(b){b.disabled=true});bs[i].className="opt right";
+  var last=S.qi===4;
+  fb.innerHTML='<div class="fb ok">Great detective work! '+q.e+'</div>'+(last?'<button class="go" onclick="fin()">Finish Mission 1</button>':'<button class="go" onclick="S.qi++;quiz()">Next question</button>');
+ }else{
+  bs[i].className="opt wrong";bs[i].disabled=true;
+  fb.innerHTML='<div class="fb no">Try again! Hint: '+q.e+'</div>';
+ }
+}
+function fin(){
+ S.q=true;upd();
+ $("quiz").innerHTML='<div class="fb ok">Mission 1 complete! You know the question patterns.</div><button class="go" onclick="go(2)">Go to Mission 2</button><button class="go alt" onclick="S.qi=0;quiz()">Practise again</button>';
+}
+quiz();
+/* Mission 2 */
+$("movies").innerHTML=M.map(function(m,i){return '<button class="mv" style="--c:'+m.c+'" id="mv'+i+'" aria-pressed="false" onclick="openMv('+i+')"><span aria-hidden="true">'+m.em+'</span>'+m.n+'<small id="mvs'+i+'">Case file</small></button>'}).join("");
+function openMv(i){
+ var m=M[i];S.seen[i]=1;
+ M.forEach(function(x,k){$("mv"+k).setAttribute("aria-pressed",k===i)});
+ $("mvs"+i).textContent="Investigated ✓";
+ var a=m.o.map(function(o,k){return '<button class="opt" onclick="vq('+i+','+k+',this)">'+o+'</button>'}).join("");
+ $("mvbox").innerHTML='<div class="card"><h3>'+m.em+' '+m.n+'</h3><p>'+m.story+'</p><h3>Facts</h3><ul>'+m.facts.map(function(f){return '<li>'+f+'</li>'}).join("")+'</ul><h3>Vocabulary box</h3><div class="vocab">'+m.v.map(function(v){return '<div><b>'+v[0]+'</b>: '+v[1]+'</div>'}).join("")+'</div><h3>Reading clue</h3><p>'+m.s+'</p><div id="va">'+a+'</div><div id="vf"></div><div class="tip"><b>Detective Tip:</b> Look for familiar words around the new word. They give you clues.</div></div>';
+ if(Object.keys(S.seen).length===4&&!$("all4")){$("mvbox").insertAdjacentHTML("beforeend",'<p id="all4" class="note"><b>All four files investigated!</b> <button class="go" onclick="go(3)">Go to Mission 3</button></p>')}
+ upd();
+}
+function vq(i,k,b){
+ var m=M[i],bs=$("va").querySelectorAll(".opt");
+ if(k===m.a){bs.forEach(function(x){x.disabled=true});b.className="opt right";$("vf").innerHTML='<div class="fb ok">Great detective work! '+m.why+'</div>'}
+ else{b.className="opt wrong";b.disabled=true;$("vf").innerHTML='<div class="fb no">Try again! Read the sentence again for clues.</div>'}
+}
+/* Mission 3 */
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function qtext(w){return w.join(" ").replace(" ?","?")}
+function openQ(i){S.op=S.op===i?null:i;S.cur=[];S.bank=null;S.msg="";drawM()}
+function tile(k){
+ var q=QS[S.op];S.cur.push(k);S.msg="";
+ if(S.cur.length===q.t.length){
+  var w=S.cur.map(function(x){return S.bank[x]});
+  if(w.join(" ")===q.t.join(" ")){S.qd[S.cs][S.op]=1;S.op=null;S.bank=null;S.cur=[]}
+  else S.msg='<div class="fb no">Try again! Hint: '+q.h+'</div>';
+ }
+ drawM();
+}
+function drawM(){
+ var c=S.cs,K=CASES[c],qd=S.qd[c],n=Object.keys(qd).length,r=S.ms[c];
+ var h='<div class="tabs">'+CASES.map(function(x,i){var s=S.ms[i];return '<button class="ct'+(i===c?' cur':'')+'" aria-pressed="'+(i===c)+'" onclick="S.cs='+i+';S.op=null;S.bank=null;S.cur=[];S.msg=\'\';drawM()">Case '+(i+1)+(s?(s.ok?' ✓':' ✗'):'')+'</button>'}).join("")+'</div>';
+ h+='<div class="card mys"><h3>Case '+(c+1)+': The Secret Movie 🔒</h3><p><b>Step 1.</b> Ask the witness five questions. Tap a question, then tap the word tiles in the right order. (<b>'+n+' of 5</b> asked)</p>';
+ QS.forEach(function(q,i){
+  var dn=qd[i];
+  h+='<div class="qrow"><button class="qb" '+(dn?'disabled ':'')+'aria-expanded="'+(S.op===i)+'" onclick="openQ('+i+')"><span class="bd">'+q.w+'</span>'+(dn?qtext(q.t)+' ✓':'Build this question')+'</button>';
+  if(dn)h+='<div class="bub"><span aria-hidden="true">🕵️</span> <b>Witness:</b> '+K.a[i]+'</div>';
+  if(S.op===i&&!dn){
+   if(!S.bank)S.bank=shuffle(q.t.concat(q.d));
+   h+='<div class="build"><div class="line" aria-live="polite">'+(S.cur.length?qtext(S.cur.map(function(x){return S.bank[x]})):'Your question appears here…')+'</div><div>'+S.bank.map(function(w,k){return '<button class="tile" '+(S.cur.indexOf(k)>-1?'disabled ':'')+'onclick="tile('+k+')">'+w+'</button>'}).join("")+'</div><button class="go alt" onclick="S.cur.pop();S.msg=\'\';drawM()">Undo</button><button class="go alt" onclick="S.cur=[];S.msg=\'\';drawM()">Clear</button>'+S.msg+'</div>';
+  }
+  h+='</div>';
+ });
+ h+='<h3>Step 2. Your guess</h3>';
+ if(n<5)h+='<div class="clue locked">🔒 The movie is secret. Ask all five questions to unlock your guess.</div>';
+ else if(r===null)h+='<p>Which movie is it?</p><select id="g" aria-label="My guess"><option value="">Choose a movie</option>'+MM.map(function(m,k){return '<option value="'+k+'">'+m.n+'</option>'}).join("")+'</select><label for="why">Why do you think so? (Write it in your exercise book too.)</label><textarea id="why"></textarea><button class="go" onclick="guess()">Check my guess</button><div id="gm" aria-live="polite"></div>';
+ else h+='<div class="stamp2'+(r.ok?'':' no')+'">'+(r.ok?'CASE SOLVED':'CASE CLOSED')+'</div><div class="fb '+(r.ok?'ok':'no')+'">'+(r.ok?'Great detective work!':'Good try, detective!')+' The secret movie is <b>'+MM[K.m].n+'</b> '+MM[K.m].em+'.</div><p>'+K.why+'</p>'+(c<3?'<button class="go" onclick="S.cs='+(c+1)+';drawM()">Next case</button>':'<button class="go" onclick="go(4)">See my Detective Report</button>');
+ $("mys").innerHTML=h+'</div>';
+}
+function guess(){
+ var c=S.cs,v=$("g").value;
+ if(v===""){$("gm").innerHTML='<div class="fb no">Choose a movie first.</div>';return}
+ if(+v===CASES[c].m){S.ms[c]={ok:true,first:S.tries[c]===0};drawM();upd()}
+ else{S.tries[c]++;$("gm").innerHTML='<div class="fb no">Not yet! Read the witness answers again and try another movie.</div><button class="go alt" onclick="reveal()">Show me the answer</button>'}
+}
+function reveal(){S.ms[S.cs]={ok:false};drawM();upd()}
+drawM();
+/* Mission 5 */
+function report(){
+ var d=done(),mc=d.slice(0,3).filter(Boolean).length,ok=S.ms.filter(function(r){return r&&r.ok}).length;
+ $("rep").innerHTML='<div class="stats"><div class="card"><b>'+mc+' / 3</b>missions completed</div><div class="card"><b>'+ok+' / 4</b>correct mystery guesses</div></div>'+
+ (mc<3?'<p class="note">Some missions are not finished yet. You can go back using the tabs at the top.</p>':'<p class="fb ok">Excellent! You finished every mission, Junior Detective! 🎉</p>')+
+ '<h3>Question structures review</h3><div class="card"><p>What / Where / When / Who / How + <b>did</b> + subject + <b>base verb</b>? <span class="q">Where did Moana live?</span></p><p><b>Was / Were</b> + subject + complement? <span class="q">Was Dory a blue fish?</span></p><p><b>Did</b> + subject + <b>base verb</b>? <span class="q">Did Moana help Maui?</span></p></div>'+
+ '<h3>Final checklist</h3><div class="card"><label class="check"><input type="checkbox"> I recorded Case 1–4, my questions, the witness answers and my guesses in my exercise book.</label><label class="check"><input type="checkbox"> I checked spelling and punctuation.</label><label class="check"><input type="checkbox"> I took a photograph of my exercise-book work.</label><label class="check"><input type="checkbox"> I submitted my photograph through Google Classroom.</label><p class="note warn">This website does not send your work. Your teacher only receives it when you submit it in Google Classroom.</p></div>'+
+ '<button class="go" onclick="restart()">RESTART</button>';
+}
+function restart(){
+ S.qi=0;S.q=false;S.seen={};S.ms=[null,null,null,null];S.cs=0;S.qd=[{},{},{},{}];S.op=null;S.cur=[];S.bank=null;S.msg="";S.tries=[0,0,0,0];
+ $("mvbox").innerHTML="";
+ M.forEach(function(m,i){$("mv"+i).setAttribute("aria-pressed","false");$("mvs"+i).textContent="Case file"});
+ document.querySelectorAll("input[type=checkbox]").forEach(function(x){x.checked=false});
+ quiz();drawM();go(0);
+}
+upd();
+</script>
+</body>
+</html>
